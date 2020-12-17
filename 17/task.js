@@ -13,7 +13,6 @@ console.time("Part 1");
             for (let y = Y - 1; y <= Y + 1; ++y) {
                 if (!space[z][y]) continue;
                 for (let x = X - 1; x <= X + 1; ++x) {
-                    if (x === X && y === Y && z === Z) continue;
                     ans += space[z][y][x] === '#';
                 }
             }
@@ -21,37 +20,17 @@ console.time("Part 1");
         return ans;
     }
 
-    function display(space, Z) {
-        let ans = 0;
-        for (let z = -Z - 1; z <= Z + 1; ++z) {
-            if (!space[z]) continue;
-            // const acc = ['\n'];
-            let count = 0;
-            for (let y = -Z - 1; y < N + Z + 1; ++y) {
-                if (!space[z][y]) continue;
-                for (let x = -Z - 1; x < N + Z + 1; ++x) {
-                    // acc.push(space[z][y][x]);
-                    if (space[z][y][x] === '#') ++count;
-                }
-                // acc.push('\n');
-            }
-            // console.debug(z, count, acc.join(''));
-            ans += count;
-        }
-
-        console.info("ITERATION ", Z + 1, ans);
-    }
-
     function evolve(space, Z) {
-        const newSpace = {}
+        const newSpace = []
+        let count = 0;
         for (let z = -Z - 1; z <= Z + 1; ++z) {
-            const thisLayer = {...(space[z] || {})};
-            const newLayer = {};
+            const thisLayer = space[z] || [];
+            const newLayer = [];
             let wasActiveLayer = false;
 
             for (let y = -Z - 1; y < N + Z + 1; ++y) {
-                const thisRow = {...(thisLayer[y] || {})};
-                const newRow = {};
+                const thisRow = thisLayer[y] || [];
+                const newRow = [];
                 let wasActiveRow = false;
                 for (let x = -Z - 1; x < N + Z + 1; ++x) {
                     const thisE = thisRow[x] || '.';
@@ -59,11 +38,12 @@ console.time("Part 1");
                     if (thisE === '.') {
                         newRow[x] = thisNeigbours === 3 ? '#' : '.';
                     } else {
-                        newRow[x] = [2, 3].includes(thisNeigbours) ? '#' : '.';
+                        newRow[x] = [4, 3].includes(thisNeigbours) ? '#' : '.';
                     }
                     wasActiveRow = wasActiveRow || newRow[x] === '#';
+                    count += newRow[x] === '#';
                 }
-                newLayer[y] = {};
+                newLayer[y] = [];
                 if (wasActiveRow) {
                     newLayer[y] = newRow;
                     wasActiveLayer = true;
@@ -71,11 +51,11 @@ console.time("Part 1");
             }
             if (wasActiveLayer) newSpace[z] = newLayer;
         }
-        display(newSpace, Z);
+        console.debug("Iteration", Z + 1, count);
         return newSpace;
     }
 
-    let s = {0: rawData};
+    let s = [rawData];
     for (let z = 0; z < 6; ++z) {
         s = evolve(s, z);
     }
@@ -93,7 +73,6 @@ console.time("Part 2");
                 for (let y = Y - 1; y <= Y + 1; ++y) {
                     if (!space[w][z][y]) continue;
                     for (let x = X - 1; x <= X + 1; ++x) {
-                        if (w === W && x === X && y === Y && z === Z) continue;
                         ans += space[w][z][y][x] === '#';
                     }
                 }
@@ -102,39 +81,21 @@ console.time("Part 2");
         return ans;
     }
 
-    function display(space, Z) {
-        let ans = 0;
-        for (let w = -Z - 1; w <= Z + 1; ++w) {
-            if (!space[w]) continue;
-            for (let z = -Z - 1; z <= Z + 1; ++z) {
-                if (!space[w][z]) continue;
-                let count = 0;
-                for (let y = -Z - 1; y < N + Z + 1; ++y) {
-                    if (!space[w][z][y]) continue;
-                    for (let x = -Z - 1; x < N + Z + 1; ++x) {
-                        if (space[w][z][y][x] === '#') ++count;
-                    }
-                }
-                ans += count;
-            }
-        }
-
-        console.info("ITERATION ", Z + 1, ans);
-    }
-
     function evolve(space, Z) {
-        const newSpace = {}
+        const newSpace = [];
+        let count = 0;
+
         for (let w = -Z - 1; w <= Z + 1; ++w) {
-            const thisCube = {...(space[w] || {})};
-            const newCube = {};
+            const thisCube = space[w] || [];
+            const newCube = [];
             for (let z = -Z - 1; z <= Z + 1; ++z) {
-                const thisLayer = {...(thisCube[z] || {})};
-                const newLayer = {};
+                const thisLayer = thisCube[z] || [];
+                const newLayer = [];
                 let wasActiveLayer = false;
 
                 for (let y = -Z - 1; y < N + Z + 1; ++y) {
-                    const thisRow = {...(thisLayer[y] || {})};
-                    const newRow = {};
+                    const thisRow = thisLayer[y] || [];
+                    const newRow = [];
                     let wasActiveRow = false;
                     for (let x = -Z - 1; x < N + Z + 1; ++x) {
                         const thisE = thisRow[x] || '.';
@@ -142,11 +103,12 @@ console.time("Part 2");
                         if (thisE === '.') {
                             newRow[x] = thisNeigbours === 3 ? '#' : '.';
                         } else {
-                            newRow[x] = [2, 3].includes(thisNeigbours) ? '#' : '.';
+                            newRow[x] = [4, 3].includes(thisNeigbours) ? '#' : '.';
                         }
                         wasActiveRow = wasActiveRow || newRow[x] === '#';
+                        count += newRow[x] === '#';
                     }
-                    newLayer[y] = {};
+                    newLayer[y] = [];
                     if (wasActiveRow) {
                         newLayer[y] = newRow;
                         wasActiveLayer = true;
@@ -156,11 +118,11 @@ console.time("Part 2");
             }
             newSpace[w] = newCube;
         }
-        display(newSpace, Z);
+        console.debug("Iteration", Z + 1, count);
         return newSpace;
     }
 
-    let s = {0: {0: rawData}};
+    let s = [[rawData]];
     for (let z = 0; z < 6; ++z) {
         s = evolve(s, z);
     }
