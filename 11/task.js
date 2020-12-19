@@ -116,7 +116,6 @@ let wasChange = true;
 
 while (wasChange) {
     [plan, wasChange] = iteration(plan);
-    console.debug({wasChange, prev: plan[95].join(''), last: plan[96].join('')});
 }
 
 console.log(plan.reduce((acc, row) => row.reduce(
