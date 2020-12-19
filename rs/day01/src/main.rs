@@ -8,13 +8,13 @@ type FreqMap = [bool; 2020];
 fn main() {
     let reading_timer = Instant::now();
     let (numbers, freqs) = read_input();
-    println!("Read in {}ms", reading_timer.elapsed().as_micros());
+    println!("Read in {}μs", reading_timer.elapsed().as_micros());
 
     let part1_timer = Instant::now();
-    println!("Part 1 is {}, took {}ms", part1(&numbers, freqs), part1_timer.elapsed().as_micros());
+    println!("Part 1 is {}, took {}μs", part1(&numbers, freqs), part1_timer.elapsed().as_micros());
 
     let part2_timer = Instant::now();
-    println!("Part 2 is {}, took {}ms", part2(&numbers, freqs), part2_timer.elapsed().as_micros());
+    println!("Part 2 is {}, took {}μs", part2(&numbers, freqs), part2_timer.elapsed().as_micros());
 }
 
 fn part1(numbers: &[i32], freqs: FreqMap) -> i32 {
