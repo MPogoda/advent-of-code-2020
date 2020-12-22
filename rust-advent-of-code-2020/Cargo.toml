@@ -9,3 +9,4 @@ edition = "2018"
 [dependencies]
 aoc-runner-derive = "^0.3"
 aoc-runner = "^0.3"
+itertools = "0.9"

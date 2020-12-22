@@ -1,19 +1,7 @@
-use std::io::{self, BufRead};
-use std::time::{Instant};
+use itertools::Itertools;
 
-fn main() {
-    let reading_timer = Instant::now();
-    let input = read_input();
-    println!("Read in {}μs", reading_timer.elapsed().as_micros());
-
-    let part1_timer = Instant::now();
-    println!("Part 1 is {}, took {}μs", part1(&input), part1_timer.elapsed().as_micros());
-
-    let part2_timer = Instant::now();
-    println!("Part 2 is {}, took {}μs", part2(&input), part2_timer.elapsed().as_micros());
-}
-
-fn is_valid_field<'a>(field: &'a str) -> bool {
+fn is_valid_field(field: &str) -> bool {
+    if field.is_empty() { return false }
     let (key, value) = field.split_at(4);
     match key {
         "byr:" => if let Ok(v) = value.parse::<usize>() {
@@ -50,38 +38,40 @@ fn is_valid_field<'a>(field: &'a str) -> bool {
     false
 }
 
-fn read_input() -> Vec<String> {
-    io::stdin()
-        .lock()
+#[aoc(day4, part1)]
+pub fn part1(input: &str) -> usize {
+    let groups = input
         .lines()
-        .filter(|v| v.is_ok())
-        .map(|v| v.unwrap())
-        .collect()
-}
+        .group_by(|v| v.is_empty());
 
-fn part1(input: &[String]) -> usize {
-    input
-        .split(|v| v.is_empty())
-        .filter(|group| {
-            let iter = group.iter().flat_map(|v| v.split(' '));
-            let has_cid = iter.clone().any(|x| x.starts_with("cid"));
-            let count = iter.count();
-
-            count == 7 && !has_cid || count == 8
+    groups
+        .into_iter()
+        .map(|(_, group)| {
+            group
+                .into_iter()
+                .flat_map(|v| v.split(' '))
+                .filter(|v| !v.starts_with("cid"))
+                .count()
         })
+        .filter(|&v| v == 7)
         .count()
 }
 
-fn part2(input: &[String]) -> usize {
-    input
-        .split(|v| v.is_empty())
-        .filter(|group|
-            7 == group
-                .iter()
+#[aoc(day4, part2)]
+pub fn part2(input: &str) -> usize {
+    let groups = input
+        .lines()
+        .group_by(|v| v.is_empty());
+
+    groups
+        .into_iter()
+        .map(|(_, group)| {
+            group
+                .into_iter()
                 .flat_map(|v| v.split(' '))
                 .filter(|v| is_valid_field(v))
                 .count()
-        )
+        })
+        .filter(|&v| v == 7)
         .count()
 }
-
