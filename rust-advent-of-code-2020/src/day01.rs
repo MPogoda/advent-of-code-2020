@@ -1,10 +1,13 @@
+use std::str;
+
 type SeenMap = [bool; 2020];
 type Input = (Vec<usize>, SeenMap);
+
 #[aoc_generator(day1)]
-pub fn input_generator(input: &str) -> Input {
+pub fn input_generator(input: &[u8]) -> Input {
     let mut result: Vec<_> = input
-        .lines()
-        .map(|l| l.parse().unwrap())
+        .split(|&ch| ch == b'\n')
+        .map(|l| str::from_utf8(l).unwrap().parse().unwrap())
         .collect();
 
     result.sort_unstable();
