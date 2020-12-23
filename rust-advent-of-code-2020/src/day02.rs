@@ -1,15 +1,17 @@
-type Input = (usize, usize, char, String);
+use std::str;
+
+type Input = (usize, usize, u8, Vec<u8>);
 #[aoc_generator(day2)]
-pub fn input_generator(input: &str) -> Vec<Input> {
+pub fn input_generator(input: &[u8]) -> Vec<Input> {
     input
-        .lines()
-        .map(|l| {
-            let mut parts = l.split(' ');
-            let mut range = parts.next().unwrap().split('-');
-            let lhs = range.next().unwrap().parse().unwrap();
-            let rhs = range.next().unwrap().parse().unwrap();
-            let ch = parts.next().unwrap().chars().next().unwrap();
-            let pwd = parts.next().unwrap().to_string();
+        .split(|&ch| ch == b'\n')
+        .map(|line| {
+            let mut parts = line.split(|&ch| ch == b' ');
+            let mut range = parts.next().unwrap().split(|&ch| ch == b'-');
+            let lhs = str::from_utf8(range.next().unwrap()).unwrap().parse().unwrap();
+            let rhs = str::from_utf8(range.next().unwrap()).unwrap().parse().unwrap();
+            let ch = *parts.next().unwrap().get(0).unwrap();
+            let pwd = parts.next().unwrap().to_vec();
 
             (lhs, rhs, ch, pwd)
         })
@@ -22,8 +24,8 @@ pub fn part1(input: &[Input]) -> usize {
         .iter()
         .filter(|(min, max, ch, pwd)| {
             let count = pwd
-                .chars()
-                .filter(|c| c == ch)
+                .iter()
+                .filter(|&c| c == ch)
                 .count();
             count >= *min && count <= *max
         })
@@ -35,8 +37,8 @@ pub fn part2(input: &[Input]) -> usize {
     input
         .iter()
         .filter(|(lhs, rhs, ch, pwd)| {
-            let is_lhs = pwd.chars().nth(*lhs - 1) == Some(*ch);
-            let is_rhs = pwd.chars().nth(*rhs - 1) == Some(*ch);
+            let is_lhs = pwd.get(*lhs - 1) == Some(ch);
+            let is_rhs = pwd.get(*rhs - 1) == Some(ch);
             is_lhs != is_rhs
         })
         .count()
