@@ -2,17 +2,17 @@ use std::collections::HashSet;
 use std::iter::FromIterator;
 
 #[aoc_generator(day5)]
-pub fn read_input(input: &str) -> Vec<u16> {
+pub fn read_input(input: &[u8]) -> Vec<u16> {
     input
-        .lines()
+        .split(|&ch| ch == b'\n')
         .map(|v| {
             let (row_s, seat_s) = v.split_at(7);
             let row = u16::from_str_radix(
-                &row_s.chars().map(|x| if x == 'F' { '0' } else { '1'}).collect::<String>(),
+                &row_s.iter().map(|&x| if x == b'F' { '0' } else { '1'}).collect::<String>(),
                 2
             ).unwrap();
             let seat = u16::from_str_radix(
-                &seat_s.chars().map(|x| if x == 'L' { '0' } else { '1' }).collect::<String>(),
+                &seat_s.iter().map(|&x| if x == b'L' { '0' } else { '1' }).collect::<String>(),
                 2
             ).unwrap();
             calculate_id(row, seat)
