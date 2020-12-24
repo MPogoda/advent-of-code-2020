@@ -1,36 +1,19 @@
-use std::io::{self, BufRead};
-use std::time::{Instant};
-
 use itertools::Itertools;
 
-fn main() {
-    let reading_timer = Instant::now();
-    let input = read_input();
-    println!("Read in {}μs", reading_timer.elapsed().as_micros());
-
-    let part1_timer = Instant::now();
-    let part1_result = part1(input.clone());
-    println!("Part 1 is {}, took {}μs", part1_result, part1_timer.elapsed().as_micros());
-
-    let part2_timer = Instant::now();
-    println!("Part 2 is {}, took {}μs", part2(input, part1_result), part2_timer.elapsed().as_micros());
-}
-
 #[derive(Copy, Clone, Debug, PartialEq)]
-enum Seat { Empty, Occupied, Floor }
-type Field = Vec<Vec<Seat>>;
+pub enum Seat { Empty, Occupied, Floor }
+pub type Field = Vec<Vec<Seat>>;
 type Coord<T = usize> = (T, T);
 
-fn read_input() -> Field {
-    io::stdin()
-        .lock()
+#[aoc_generator(day11)]
+pub fn read_input(input: &str) -> Field {
+    input
         .lines()
-        .filter(|v| v.is_ok())
-        .map(
-            |row| row.unwrap().chars().map(|ch| match ch {
-                'L' => Seat::Empty,
-                _ => Seat::Floor
-            }).collect()
+        .map(|line|
+            line
+                .bytes()
+                .map(|ch| if ch == b'L' { Seat::Empty } else { Seat::Floor })
+                .collect()
         )
         .collect()
 }
@@ -93,8 +76,9 @@ fn evolve(
     (changed, occupied, next)
 }
 
-fn part1(input: Field) -> u16 {
-    let mut prev = input;
+#[aoc(day11, part1)]
+fn part1(input: &Field) -> u16 {
+    let mut prev = input.to_vec();
     loop {
         let (changed, occupied, next) = evolve(prev, simple_neighbours, 4);
         if !changed { return occupied }
@@ -118,6 +102,7 @@ fn go_in_direction(field: &Field, (x0, y0): Coord, (dy, dx): Coord<isize>) -> bo
     }
     false
 }
+
 fn far_neighbours(field: &Field, coord: Coord) -> usize {
     (-1isize..=1)
         .cartesian_product(-1isize..=1)
@@ -125,8 +110,9 @@ fn far_neighbours(field: &Field, coord: Coord) -> usize {
         .count()
 }
 
-fn part2(input: Field, _: u16) -> u16 {
-    let mut prev = input;
+#[aoc(day11, part2)]
+fn part2(input: &Field) -> u16 {
+    let mut prev = input.to_vec();
     loop {
         let (changed, occupied, next) = evolve(prev, far_neighbours, 5);
         if !changed { return occupied }
