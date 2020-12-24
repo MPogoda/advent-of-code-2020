@@ -1,38 +1,22 @@
-use std::io::{self, BufRead};
-use std::time::{Instant};
 use std::collections::HashSet;
 
-fn main() {
-    let reading_timer = Instant::now();
-    let input = read_input();
-    println!("Read in {}μs", reading_timer.elapsed().as_micros());
-
-    let part1_timer = Instant::now();
-    println!("Part 1 is {}, took {}μs", part1(&input), part1_timer.elapsed().as_micros());
-
-    let part2_timer = Instant::now();
-    println!("Part 2 is {}, took {}μs", part2(&input), part2_timer.elapsed().as_micros());
-}
-
 #[derive(Clone, Debug)]
-enum Instr { ACC, JMP, NOP }
-type Cmd = (Instr, i32);
+pub enum Instr {ACC, JMP, NOP }
+pub type Cmd = (Instr, i32);
 
-fn read_input() -> Vec<Cmd> {
-    io::stdin()
-        .lock()
-        .lines()
-        .filter(|v| v.is_ok())
-        .map(|v| {
-            let str = v.unwrap();
-            let (lhs, rhs) = str.split_at(4);
+#[aoc_generator(day8)]
+pub fn parse_input(input: &[u8]) -> Vec<Cmd> {
+    input
+        .split(|&ch| ch == b'\n')
+        .map(|line| {
+            let (lhs, rhs) = line.split_at(4);
             (
                 match lhs {
-                    "acc " => Instr::ACC,
-                    "jmp " => Instr::JMP,
+                    b"acc " => Instr::ACC,
+                    b"jmp " => Instr::JMP,
                     _ => Instr::NOP
                 },
-                rhs.parse().unwrap()
+                std::str::from_utf8(rhs).unwrap().parse().unwrap()
             )
         })
         .collect()
@@ -66,13 +50,14 @@ fn run(input: &[Cmd]) -> (i32, HashSet<usize>) {
     (result, visited)
 }
 
-fn part1(input: &[Cmd]) -> i32 {
+#[aoc(day8, part1)]
+pub fn part1(input: &[Cmd]) -> i32 {
     run(input).0
 }
 
+#[aoc(day8, part2)]
 fn part2(input: &[Cmd]) -> i32 {
-    let mut program = Vec::with_capacity(input.len());
-    program.extend_from_slice(input);
+    let mut program = input.to_vec();
 
     let culprits = run(&program).1;
 
@@ -99,4 +84,3 @@ fn part2(input: &[Cmd]) -> i32 {
     }
     panic!("Cannot find solution!");
 }
-
