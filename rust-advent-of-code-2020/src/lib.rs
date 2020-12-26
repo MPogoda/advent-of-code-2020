@@ -1,6 +1,8 @@
 extern crate aoc_runner;
 #[macro_use]
 extern crate aoc_runner_derive;
+#[macro_use]
+extern crate lazy_static;
 
 pub mod day01;
 pub mod day02;
@@ -15,4 +17,5 @@ pub mod day10;
 pub mod day11;
 pub mod day12;
 pub mod day13;
+pub mod day14;
 aoc_lib!{ year = 2020 }
