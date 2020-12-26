@@ -3,6 +3,7 @@ const fs = require('fs');
 const data = fs.readFileSync('input', 'UTF-8');
 const rawData = data.split('\n\n');
 
+console.time("Input");
 const rawRules = rawData[0].split('\n');
 const thisTicket = rawData[1].split('\n')[1].split(',').map((v) => Number(v));
 const otherTickets = rawData[2].split('\n').slice(1, -1).map(
@@ -18,6 +19,7 @@ for (const rule of rawRules) {
     for (let i = Number(r1s); i <= Number(r1e); ++i) rulesMatch[i].add(name);
     for (let i = Number(r2s); i <= Number(r2e); ++i) rulesMatch[i].add(name);
 }
+console.timeEnd("Input");
 
 console.time("Part 1");
 console.info(otherTickets.reduce(
