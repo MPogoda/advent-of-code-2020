@@ -312,7 +312,6 @@ impl Tile {
 
         for coord in iproduct!(0..(self.w - 2), 0..(self.w-19)) {
             if self.check_monster(&coord) {
-                println!("Gotcha!");
                 self.mark_monster(&coord);
                 seen_monster = true;
             }
