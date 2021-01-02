@@ -1,12 +1,12 @@
-use std::collections::VecDeque;
 use itertools::Itertools;
+use std::collections::VecDeque;
 
 type RuleSet = Vec<usize>;
 type Line = Vec<u8>;
 #[derive(Clone)]
 enum Rule {
     Verbatim(u8),
-    Recursive(Vec<RuleSet>)
+    Recursive(Vec<RuleSet>),
 }
 
 type Input = (Vec<Rule>, Vec<Line>);
@@ -22,7 +22,10 @@ fn parse_rule(line: &str) -> (usize, Rule) {
         let mut rulesets = Vec::new();
         for part in rhs.split('|') {
             rulesets.push(
-                part.split(' ').filter(|v| !v.is_empty()).map(|num| num.parse().unwrap()).collect()
+                part.split(' ')
+                    .filter(|v| !v.is_empty())
+                    .map(|num| num.parse().unwrap())
+                    .collect(),
             );
         }
         (id, Rule::Recursive(rulesets))
@@ -59,7 +62,9 @@ fn non_recursive_verify_subrule(line: &[u8], rules: &[Rule], subrule: &RuleSet) 
     for p in subrule {
         let matched_length = non_recursive_verify(&line[matched..], rules, &rules[*p]);
         matched += matched_length;
-        if matched == 0 || matched_length > line.len() { return 0; }
+        if matched == 0 || matched_length > line.len() {
+            return 0;
+        }
     }
     matched
 }
@@ -67,16 +72,17 @@ fn non_recursive_verify_subrule(line: &[u8], rules: &[Rule], subrule: &RuleSet) 
 fn non_recursive_verify(line: &[u8], rules: &[Rule], rule: &Rule) -> usize {
     match rule {
         Rule::Verbatim(ch) => {
-            if line.first() == Some(ch) { 1 }
-            else { 0 }
-        },
-        Rule::Recursive(rulesets) => {
-            rulesets
-                .iter()
-                .map(|subrule| non_recursive_verify_subrule(line, rules, subrule))
-                .max()
-                .unwrap()
+            if line.first() == Some(ch) {
+                1
+            } else {
+                0
+            }
         }
+        Rule::Recursive(rulesets) => rulesets
+            .iter()
+            .map(|subrule| non_recursive_verify_subrule(line, rules, subrule))
+            .max()
+            .unwrap(),
     }
 }
 
@@ -95,10 +101,12 @@ fn recursive_verify_subrule(line: &[u8], rules: &[Rule], subrule: &RuleSet) -> V
     // [idx, slice]
     queue.push_back((0, 0));
     while let Some((p, slice)) = queue.pop_front() {
-        if slice > line.len() { continue }
+        if slice > line.len() {
+            continue;
+        }
         if p == subrule.len() {
             matched.push(slice);
-            continue
+            continue;
         }
         for next in recursive_verify(&line[slice..], rules, &rules[subrule[p]]) {
             queue.push_back((p + 1, slice + next));
@@ -110,15 +118,16 @@ fn recursive_verify_subrule(line: &[u8], rules: &[Rule], subrule: &RuleSet) -> V
 fn recursive_verify(line: &[u8], rules: &[Rule], rule: &Rule) -> Vec<usize> {
     match rule {
         Rule::Verbatim(ch) => {
-            if line.first() == Some(ch) { vec![1] }
-            else { vec![] }
-        },
-        Rule::Recursive(rulesets) => {
-            rulesets
-                .iter()
-                .flat_map(|subrule| recursive_verify_subrule(line, rules, subrule))
-                .collect()
+            if line.first() == Some(ch) {
+                vec![1]
+            } else {
+                vec![]
+            }
         }
+        Rule::Recursive(rulesets) => rulesets
+            .iter()
+            .flat_map(|subrule| recursive_verify_subrule(line, rules, subrule))
+            .collect(),
     }
 }
 

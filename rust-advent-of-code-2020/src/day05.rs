@@ -8,13 +8,21 @@ pub fn read_input(input: &[u8]) -> Vec<u16> {
         .map(|v| {
             let (row_s, seat_s) = v.split_at(7);
             let row = u16::from_str_radix(
-                &row_s.iter().map(|&x| if x == b'F' { '0' } else { '1'}).collect::<String>(),
-                2
-            ).unwrap();
+                &row_s
+                    .iter()
+                    .map(|&x| if x == b'F' { '0' } else { '1' })
+                    .collect::<String>(),
+                2,
+            )
+            .unwrap();
             let seat = u16::from_str_radix(
-                &seat_s.iter().map(|&x| if x == b'L' { '0' } else { '1' }).collect::<String>(),
-                2
-            ).unwrap();
+                &seat_s
+                    .iter()
+                    .map(|&x| if x == b'L' { '0' } else { '1' })
+                    .collect::<String>(),
+                2,
+            )
+            .unwrap();
             calculate_id(row, seat)
         })
         .collect()
@@ -26,10 +34,7 @@ fn calculate_id(row: u16, seat: u16) -> u16 {
 
 #[aoc(day5, part1)]
 pub fn part1(input: &[u16]) -> u16 {
-    *input
-        .iter()
-        .max()
-        .unwrap()
+    *input.iter().max().unwrap()
 }
 
 #[aoc(day5, part2)]
@@ -42,7 +47,7 @@ pub fn part2(input: &[u16]) -> u16 {
             if places.contains(&id) {
                 seen_place = true;
             } else if seen_place {
-                return id
+                return id;
             }
         }
     }

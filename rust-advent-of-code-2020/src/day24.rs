@@ -6,7 +6,7 @@ type Coord = (i16, i16);
 struct Field {
     field: HashSet<Coord>,
     min: Coord,
-    max: Coord
+    max: Coord,
 }
 
 impl Field {
@@ -14,7 +14,7 @@ impl Field {
         Field {
             field: HashSet::new(),
             min: (i16::MAX, i16::MAX),
-            max: (i16::MIN, i16::MIN)
+            max: (i16::MIN, i16::MIN),
         }
     }
 
@@ -39,8 +39,8 @@ impl Field {
                     let mult = if prev_vertical { 1 } else { 2 };
                     coord.1 += mult * if ch == &b'e' { 1 } else { -1 };
                     prev_vertical = false;
-                },
-                _ => panic!("Unexpected direction!")
+                }
+                _ => panic!("Unexpected direction!"),
             }
         }
 
@@ -74,11 +74,10 @@ fn part1(input: &Field) -> usize {
 }
 
 impl Field {
-    const NEIGHBOURS_DIFFS: [Coord; 6] = [
-        (0, 2), (0, -2), (2, 1), (2, -1), (-2, 1), (-2, -1)
-    ];
+    const NEIGHBOURS_DIFFS: [Coord; 6] = [(0, 2), (0, -2), (2, 1), (2, -1), (-2, 1), (-2, -1)];
     fn neighbours(&self, (n, e): &Coord) -> usize {
-        Field::NEIGHBOURS_DIFFS.iter()
+        Field::NEIGHBOURS_DIFFS
+            .iter()
             .filter(|(dn, de)| self.field.contains(&(n + dn, e + de)))
             .count()
     }
@@ -95,7 +94,7 @@ impl Field {
             match (is_set, neighbours) {
                 (false, 2) | (true, 1) | (true, 2) => {
                     result.flip(coord);
-                },
+                }
                 _ => {}
             }
         }

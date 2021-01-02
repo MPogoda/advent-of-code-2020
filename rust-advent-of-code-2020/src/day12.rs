@@ -17,13 +17,17 @@ fn move_coord((y, x): &Coord, (dy, dx): &Coord, n: i64) -> Coord {
 }
 
 fn move_direction(coord: &Coord, direction: u8, n: i64) -> Coord {
-    move_coord(coord, match direction {
-        b'N' => &(1, 0),
-        b'E' => &(0, 1),
-        b'S' => &(-1, 0),
-        b'W' => &(0, -1),
-        _ => panic!("Wrong direction!")
-    }, n)
+    move_coord(
+        coord,
+        match direction {
+            b'N' => &(1, 0),
+            b'E' => &(0, 1),
+            b'S' => &(-1, 0),
+            b'W' => &(0, -1),
+            _ => panic!("Wrong direction!"),
+        },
+        n,
+    )
 }
 
 const DIRECTIONS: &[u8; 4] = b"NESW";
@@ -43,13 +47,13 @@ fn part1(input: &[Command]) -> i64 {
             b'L' => {
                 dir = rotate_direction(dir, -*num);
                 coords
-            },
+            }
             b'R' => {
                 dir = rotate_direction(dir, *num);
                 coords
-            },
+            }
             b'F' => move_direction(&coords, DIRECTIONS[dir], *num),
-            _ => move_direction(&coords, *cmd, *num)
+            _ => move_direction(&coords, *cmd, *num),
         }
     }
     coords.0.wrapping_abs() + coords.1.wrapping_abs()
@@ -62,7 +66,7 @@ fn rotate_waypoint((y, x): &Coord, n: i64) -> Coord {
         1 => (-*x, *y),
         2 => (-*y, -*x),
         3 => (*x, -*y),
-        _ => panic!("Wrong rotation!")
+        _ => panic!("Wrong rotation!"),
     }
 }
 
@@ -76,11 +80,11 @@ fn part2(input: &[Command]) -> i64 {
             b'L' => {
                 waypoint = rotate_waypoint(&waypoint, -*num);
                 coords
-            },
+            }
             b'R' => {
                 waypoint = rotate_waypoint(&waypoint, *num);
                 coords
-            },
+            }
             b'F' => move_coord(&coords, &waypoint, *num),
             _ => {
                 waypoint = move_direction(&waypoint, *cmd, *num);

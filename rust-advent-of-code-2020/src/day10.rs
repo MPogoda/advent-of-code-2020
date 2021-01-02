@@ -1,16 +1,10 @@
-use std::collections::{
-    HashMap,
-    HashSet
-};
-use std::iter::FromIterator;
 use itertools::Itertools;
+use std::collections::{HashMap, HashSet};
+use std::iter::FromIterator;
 
 #[aoc_generator(day10)]
 pub fn parse_input(input: &str) -> Vec<u8> {
-    let mut result: Vec<_> = input
-        .lines()
-        .map(|line| line.parse().unwrap())
-        .collect();
+    let mut result: Vec<_> = input.lines().map(|line| line.parse().unwrap()).collect();
     result.sort_unstable();
     result
 }
@@ -23,15 +17,19 @@ pub fn part1(input: &[u8]) -> u64 {
         .fold((1, 1), |(j1, j3), x| match x {
             1 => (j1 + 1, j3),
             3 => (j1, j3 + 1),
-            _ => (j1, j3)
+            _ => (j1, j3),
         });
 
     j1 * j3
 }
 
 fn recurse(values: &HashSet<&u8>, visited: &mut HashMap<u8, u64>, value: u8, target: u8) -> u64 {
-    if let Some(&v) = visited.get(&value) { return v }
-    if value == target { return 1 }
+    if let Some(&v) = visited.get(&value) {
+        return v;
+    }
+    if value == target {
+        return 1;
+    }
 
     let r = [1u8, 2, 3]
         .iter()
@@ -49,6 +47,6 @@ fn part2(input: &[u8]) -> u64 {
         &HashSet::from_iter(input.iter()),
         &mut HashMap::new(),
         0,
-        *input.last().unwrap()
+        *input.last().unwrap(),
     )
 }

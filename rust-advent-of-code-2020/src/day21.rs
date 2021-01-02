@@ -1,24 +1,27 @@
-use std::collections::{HashSet};
 use itertools::Itertools;
 use regex::Regex;
+use std::collections::HashSet;
 
 type Entry = (HashSet<String>, HashSet<String>);
 
-lazy_static!{
-    static ref RE: Regex = Regex::new(
-        r"^(?P<products>.+) \(contains (?P<allergens>.+)\)$"
-    ).unwrap();
+lazy_static! {
+    static ref RE: Regex =
+        Regex::new(r"^(?P<products>.+) \(contains (?P<allergens>.+)\)$").unwrap();
 }
 
 fn parse_line(line: &str) -> Entry {
     let captures = RE.captures(line).unwrap();
-    let products: HashSet<_> = captures.name("products").unwrap()
+    let products: HashSet<_> = captures
+        .name("products")
+        .unwrap()
         .as_str()
         .split(' ')
         .map(|word| word.to_owned())
         .collect();
 
-    let allergens: HashSet<_> = captures.name("allergens").unwrap()
+    let allergens: HashSet<_> = captures
+        .name("allergens")
+        .unwrap()
         .as_str()
         .split(", ")
         .map(|word| word.to_owned())
@@ -29,10 +32,7 @@ fn parse_line(line: &str) -> Entry {
 
 #[aoc_generator(day21)]
 fn parse_input(input: &str) -> Vec<Entry> {
-    input
-        .lines()
-        .map(parse_line)
-        .collect()
+    input.lines().map(parse_line).collect()
 }
 
 type Match = (String, String);
@@ -87,7 +87,9 @@ fn part1(input: &[Entry]) -> usize {
 fn part2(input: &[Entry]) -> String {
     let (_, mut matches) = solve(input);
     matches.sort_by_cached_key(|(_, allergen)| allergen.clone());
-    matches.drain(0..).map(|(product, _)| product)
+    matches
+        .drain(0..)
+        .map(|(product, _)| product)
         .collect_vec()
         .join(",")
 }

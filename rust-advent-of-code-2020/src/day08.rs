@@ -1,7 +1,11 @@
 use std::collections::HashSet;
 
 #[derive(Clone, Debug)]
-pub enum Instr {ACC, JMP, NOP }
+pub enum Instr {
+    ACC,
+    JMP,
+    NOP,
+}
 pub type Cmd = (Instr, i32);
 
 #[aoc_generator(day8)]
@@ -14,9 +18,9 @@ pub fn parse_input(input: &[u8]) -> Vec<Cmd> {
                 match lhs {
                     b"acc " => Instr::ACC,
                     b"jmp " => Instr::JMP,
-                    _ => Instr::NOP
+                    _ => Instr::NOP,
                 },
-                std::str::from_utf8(rhs).unwrap().parse().unwrap()
+                std::str::from_utf8(rhs).unwrap().parse().unwrap(),
             )
         })
         .collect()
@@ -28,19 +32,23 @@ fn run(input: &[Cmd]) -> (i32, HashSet<usize>) {
 
     let mut ip = 0;
     loop {
-        if visited.contains(&ip) { break }
+        if visited.contains(&ip) {
+            break;
+        }
         visited.insert(ip);
-        if ip >= input.len() { break }
+        if ip >= input.len() {
+            break;
+        }
         let (instr, param) = input.get(ip).unwrap();
 
         match instr {
             Instr::ACC => {
                 result += param;
                 ip += 1;
-            },
+            }
             Instr::NOP => {
                 ip += 1;
-            },
+            }
             Instr::JMP => {
                 ip = ip.wrapping_add(*param as usize);
             }
@@ -70,7 +78,7 @@ fn part2(input: &[Cmd]) -> i32 {
                     return result;
                 }
                 program[culprit].0 = Instr::JMP;
-            },
+            }
             Instr::NOP => {
                 program[culprit].0 = Instr::JMP;
                 let (result, visited) = run(&program);
@@ -78,7 +86,7 @@ fn part2(input: &[Cmd]) -> i32 {
                     return result;
                 }
                 program[culprit].0 = Instr::NOP;
-            },
+            }
             Instr::ACC => {}
         }
     }

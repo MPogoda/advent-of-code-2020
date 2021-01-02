@@ -3,10 +3,7 @@ type Input = (Vec<usize>, SeenMap);
 
 #[aoc_generator(day1)]
 pub fn input_generator(input: &str) -> Input {
-    let mut result: Vec<_> = input
-        .lines()
-        .map(|line| line.parse().unwrap())
-        .collect();
+    let mut result: Vec<_> = input.lines().map(|line| line.parse().unwrap()).collect();
 
     result.sort_unstable();
 
@@ -32,10 +29,14 @@ pub fn part1((numbers, seen): &Input) -> usize {
 #[aoc(day1, part2)]
 pub fn part2((numbers, seen): &Input) -> usize {
     for (i, a) in numbers.iter().enumerate() {
-        for b in numbers[(i+1)..].iter() {
-            if a + b >= 2020 { break }
+        for b in numbers[(i + 1)..].iter() {
+            if a + b >= 2020 {
+                break;
+            }
             let other = 2020 - a - b;
-            if seen[other] { return a * b * other; }
+            if seen[other] {
+                return a * b * other;
+            }
         }
     }
     panic!("Couldn't find answer");

@@ -1,18 +1,19 @@
-use std::collections::{
-    HashMap,
-    HashSet
-};
+use std::collections::{HashMap, HashSet};
 
 use itertools::Itertools;
 
 #[derive(Clone)]
 struct Tile {
     field: Vec<u8>,
-    w: usize
+    w: usize,
 }
 
 fn convert_to_binary(ch: &u8) -> u8 {
-    if *ch == b'#' { b'1' } else { b'0' }
+    if *ch == b'#' {
+        b'1'
+    } else {
+        b'0'
+    }
 }
 
 fn get_value(v: &[u8]) -> u16 {
@@ -30,10 +31,20 @@ impl Tile {
     }
 
     fn hash(&self) -> Hashes {
-        let mut top_v = self.field[0..self.w].iter().map(convert_to_binary).collect_vec();
-        let mut bottom_v = self.field[(self.w * self.w - self.w)..].iter().map(convert_to_binary).collect_vec();
-        let mut left_v = (0..self.w).map(|y| convert_to_binary(&self.field[y * self.w])).collect_vec();
-        let mut right_v = (1..=self.w).map(|y| convert_to_binary(&self.field[y * self.w - 1])).collect_vec();
+        let mut top_v = self.field[0..self.w]
+            .iter()
+            .map(convert_to_binary)
+            .collect_vec();
+        let mut bottom_v = self.field[(self.w * self.w - self.w)..]
+            .iter()
+            .map(convert_to_binary)
+            .collect_vec();
+        let mut left_v = (0..self.w)
+            .map(|y| convert_to_binary(&self.field[y * self.w]))
+            .collect_vec();
+        let mut right_v = (1..=self.w)
+            .map(|y| convert_to_binary(&self.field[y * self.w - 1]))
+            .collect_vec();
 
         let top = get_value(&top_v);
         let bottom = get_value(&bottom_v);
@@ -58,7 +69,7 @@ impl Tile {
             (bottom, right_r, top, left_r),     // flip against horizontal axis
             (top_r, left, bottom_r, right),     // flip against vertical axis
             (bottom_r, left_r, top_r, right_r), // both flips
-            (right_r, top_r, left_r, bottom_r),     // rotate left -> flip against vertical axis
+            (right_r, top_r, left_r, bottom_r), // rotate left -> flip against vertical axis
         ]
     }
 }
@@ -75,7 +86,9 @@ fn parse_input(input: &str) -> Input {
         .map(|(_, group)| {
             let mut iter = group;
             let id = iter.next().unwrap()[5..9].parse().unwrap();
-            let tile = iter.flat_map(|row| row.as_bytes().iter().cloned()).collect_vec();
+            let tile = iter
+                .flat_map(|row| row.as_bytes().iter().cloned())
+                .collect_vec();
             (id, Tile::new(tile))
         })
         .collect()
@@ -95,8 +108,12 @@ fn create_indices(input: &Input) -> Indices {
         let h = tile.hash();
 
         for (rot, (t, _, _, l)) in h.iter().enumerate() {
-            if !tops.contains_key(t) { tops.insert(*t, Vec::new()); }
-            if !lefts.contains_key(l) { lefts.insert(*l, Vec::new()); }
+            if !tops.contains_key(t) {
+                tops.insert(*t, Vec::new());
+            }
+            if !lefts.contains_key(l) {
+                lefts.insert(*l, Vec::new());
+            }
             tops.get_mut(t).unwrap().push((*id, rot));
             lefts.get_mut(l).unwrap().push((*id, rot));
         }
@@ -111,27 +128,31 @@ fn recurse(
     n: usize,
     indices: &Indices,
     visited: &mut HashSet<u64>,
-    constructed: &mut Vec<(u64, usize)>
+    constructed: &mut Vec<(u64, usize)>,
 ) -> bool {
-    if constructed.len() == n * n { return true }
+    if constructed.len() == n * n {
+        return true;
+    }
 
     let ref hashes = indices.0;
     let ref tops = indices.1;
     let ref lefts = indices.2;
 
-    let top = constructed.len()
+    let top = constructed
+        .len()
         .checked_sub(n)
         .map(|idx_top| {
             let (id, rot) = constructed[idx_top];
             hashes.get(&id).unwrap()[rot].2
         })
-        .and_then(
-            |top_hash| tops.get(&top_hash).map(
-                |matches| matches.iter()
+        .and_then(|top_hash| {
+            tops.get(&top_hash).map(|matches| {
+                matches
+                    .iter()
                     .filter(|(top_id, _)| !visited.contains(top_id))
                     .collect_vec()
-            )
-        );
+            })
+        });
 
     let left = (constructed.len() % n)
         .checked_sub(1)
@@ -139,13 +160,14 @@ fn recurse(
             let (id, rot) = constructed.last().unwrap();
             hashes.get(id).unwrap()[*rot].1
         })
-        .and_then(
-            |left_hash| lefts.get(&left_hash).map(
-                |matches| matches.iter()
+        .and_then(|left_hash| {
+            lefts.get(&left_hash).map(|matches| {
+                matches
+                    .iter()
                     .filter(|(left_id, _)| !visited.contains(left_id))
                     .collect_vec()
-            )
-        );
+            })
+        });
 
     let candidates = match (top, left) {
         (Some(t), None) => t,
@@ -154,15 +176,17 @@ fn recurse(
             let mut r = t;
             r.retain(|v| l.contains(v));
             r
-        },
-        _ => vec![]
+        }
+        _ => vec![],
     };
 
     for (id, rot) in candidates {
         constructed.push((*id, *rot));
         visited.insert(*id);
 
-        if recurse(n, indices, visited, constructed) { return true }
+        if recurse(n, indices, visited, constructed) {
+            return true;
+        }
 
         visited.remove(id);
         constructed.pop();
@@ -182,7 +206,9 @@ fn calc_part1(n: usize, input: &Input) -> Vec<(u64, usize)> {
             constructed.push((*id, rot));
             visited.insert(*id);
 
-            if recurse(n, &indices, &mut visited, &mut constructed) { return constructed }
+            if recurse(n, &indices, &mut visited, &mut constructed) {
+                return constructed;
+            }
 
             visited.remove(id);
             constructed.pop();
@@ -197,7 +223,7 @@ fn part1(input: &Input) -> u64 {
     let n = (input.len() as f32).sqrt() as usize;
 
     let constructed = calc_part1(n, input);
-    constructed[0].0 * constructed[n-1].0 * constructed[n*n - 1].0 * constructed[n*n-n].0
+    constructed[0].0 * constructed[n - 1].0 * constructed[n * n - 1].0 * constructed[n * n - n].0
 }
 
 impl Tile {
@@ -217,57 +243,76 @@ impl Tile {
                 let field = iproduct!((0..self.w).rev(), (0..self.w))
                     .map(|(i, j)| self.field[j * self.w + i])
                     .collect_vec();
-                Tile { w: self.w, field: field }
-            },
+                Tile {
+                    w: self.w,
+                    field: field,
+                }
+            }
             2 => {
                 let field = iproduct!((0..self.w).rev(), (0..self.w).rev())
                     .map(|(i, j)| self.field[i * self.w + j])
                     .collect_vec();
-                Tile { w: self.w, field: field }
-            },
+                Tile {
+                    w: self.w,
+                    field: field,
+                }
+            }
             3 => {
                 let field = iproduct!((0..self.w), (0..self.w).rev())
                     .map(|(i, j)| self.field[j * self.w + i])
                     .collect_vec();
-                Tile { w: self.w, field: field }
-            },
+                Tile {
+                    w: self.w,
+                    field: field,
+                }
+            }
             4 => {
                 let mut field = Vec::with_capacity(self.field.capacity());
                 for i in (0..self.w).rev() {
-                    field.extend_from_slice(&self.field[(i*self.w)..(i*self.w + self.w)]);
+                    field.extend_from_slice(&self.field[(i * self.w)..(i * self.w + self.w)]);
                 }
-                Tile { w: self.w, field: field }
-            },
+                Tile {
+                    w: self.w,
+                    field: field,
+                }
+            }
             5 => {
                 let mut field = Vec::with_capacity(self.field.capacity());
                 for i in 0..self.w {
-                    field.extend(self.field[(i*self.w)..(i*self.w + self.w)].iter().rev());
+                    field.extend(self.field[(i * self.w)..(i * self.w + self.w)].iter().rev());
                 }
-                Tile { w: self.w, field: field }
-            },
+                Tile {
+                    w: self.w,
+                    field: field,
+                }
+            }
             6 => {
                 let mut field = Vec::with_capacity(self.field.capacity());
                 for i in (0..self.w).rev() {
-                    field.extend(self.field[(i*self.w)..(i*self.w + self.w)].iter().rev());
+                    field.extend(self.field[(i * self.w)..(i * self.w + self.w)].iter().rev());
                 }
-                Tile { w: self.w, field: field }
-            },
+                Tile {
+                    w: self.w,
+                    field: field,
+                }
+            }
             7 => {
                 let field = iproduct!((0..self.w).rev(), (0..self.w).rev())
                     .map(|(i, j)| self.field[j * self.w + i])
                     .collect_vec();
-                Tile { w: self.w, field: field }
-            },
-            _ => panic!("Wrong rotation!")
+                Tile {
+                    w: self.w,
+                    field: field,
+                }
+            }
+            _ => panic!("Wrong rotation!"),
         }
     }
 }
 
 fn reconstruct(input: &Input, constructed: Vec<(u64, usize)>) -> Tile {
     let n = (input.len() as f32).sqrt() as usize;
-    let input_w = input.get(
-        &constructed.first().unwrap().0
-    ).unwrap().w;
+    let input_w = input.get(&constructed.first().unwrap().0).unwrap().w;
     let w = (input_w - 2) * n;
 
     let mut field = Vec::with_capacity(w * w);
@@ -292,25 +337,40 @@ fn reconstruct(input: &Input, constructed: Vec<(u64, usize)>) -> Tile {
 impl Tile {
     const POSITIONS: [(usize, usize); 15] = [
         (18, 0),
-        (0, 1), (5, 1), (6, 1), (11, 1), (12, 1), (17, 1), (18, 1), (19, 1),
-        (1, 2), (4, 2), (7, 2), (10, 2), (13, 2), (16, 2)
+        (0, 1),
+        (5, 1),
+        (6, 1),
+        (11, 1),
+        (12, 1),
+        (17, 1),
+        (18, 1),
+        (19, 1),
+        (1, 2),
+        (4, 2),
+        (7, 2),
+        (10, 2),
+        (13, 2),
+        (16, 2),
     ];
 
     fn check_monster(&self, (y, x): &(usize, usize)) -> bool {
-        x + 19 < self.w && y + 2 < self.w &&
-            Tile::POSITIONS.iter().all(|(i, j)| self.field[(y + j) * self.w + x + i] == b'#')
+        x + 19 < self.w
+            && y + 2 < self.w
+            && Tile::POSITIONS
+                .iter()
+                .all(|(i, j)| self.field[(y + j) * self.w + x + i] == b'#')
     }
 
     fn mark_monster(&mut self, (y, x): &(usize, usize)) {
         for (i, j) in Tile::POSITIONS.iter() {
-            self.field[(y+j)*self.w + x + i] = b'O';
+            self.field[(y + j) * self.w + x + i] = b'O';
         }
     }
 
     fn verify_image(&mut self) -> bool {
         let mut seen_monster = false;
 
-        for coord in iproduct!(0..(self.w - 2), 0..(self.w-19)) {
+        for coord in iproduct!(0..(self.w - 2), 0..(self.w - 19)) {
             if self.check_monster(&coord) {
                 self.mark_monster(&coord);
                 seen_monster = true;
@@ -363,7 +423,9 @@ fn part2(input: &Input) -> usize {
 
     let final_rotation = image.find_final_rotation();
 
-    final_rotation.field.iter()
+    final_rotation
+        .field
+        .iter()
         .filter(|&ch| *ch == b'#')
         .count()
 }
@@ -382,11 +444,7 @@ mod tests {
 
     #[test]
     fn rotate_0() {
-        let tile = Tile::new(vec![
-            b'.', b'.', b'.',
-            b'.', b'#', b'#',
-            b'#', b'.', b'#'
-        ]);
+        let tile = Tile::new(vec![b'.', b'.', b'.', b'.', b'#', b'#', b'#', b'.', b'#']);
         let rotated = tile.rotate(0);
         assert_eq!(rotated.field, tile.field);
 
@@ -395,114 +453,79 @@ mod tests {
 
     #[test]
     fn rotate_1() {
-        let tile = Tile::new(vec![
-            b'.', b'.', b'.',
-            b'.', b'#', b'#',
-            b'#', b'.', b'#'
-        ]);
+        let tile = Tile::new(vec![b'.', b'.', b'.', b'.', b'#', b'#', b'#', b'.', b'#']);
         let rotated = tile.rotate(1);
-        assert_eq!(rotated.field, vec![
-            b'.', b'#', b'#',
-            b'.', b'#', b'.',
-            b'.', b'.', b'#'
-        ]);
+        assert_eq!(
+            rotated.field,
+            vec![b'.', b'#', b'#', b'.', b'#', b'.', b'.', b'.', b'#']
+        );
         assert_eq!(tile.hash()[1], rotated.hash()[0]);
     }
 
     #[test]
     fn rotate_2() {
-        let tile = Tile::new(vec![
-            b'.', b'.', b'.',
-            b'.', b'#', b'#',
-            b'#', b'.', b'#'
-        ]);
+        let tile = Tile::new(vec![b'.', b'.', b'.', b'.', b'#', b'#', b'#', b'.', b'#']);
         let rotated = tile.rotate(2);
-        assert_eq!(rotated.field, vec![
-            b'#', b'.', b'#',
-            b'#', b'#', b'.',
-            b'.', b'.', b'.'
-        ]);
+        assert_eq!(
+            rotated.field,
+            vec![b'#', b'.', b'#', b'#', b'#', b'.', b'.', b'.', b'.']
+        );
         assert_eq!(tile.hash()[2], rotated.hash()[0]);
     }
 
     #[test]
     fn rotate_3() {
-        let tile = Tile::new(vec![
-            b'.', b'.', b'.',
-            b'.', b'#', b'#',
-            b'#', b'.', b'#'
-        ]);
+        let tile = Tile::new(vec![b'.', b'.', b'.', b'.', b'#', b'#', b'#', b'.', b'#']);
         let rotated = tile.rotate(3);
-        assert_eq!(rotated.field, vec![
-            b'#', b'.', b'.',
-            b'.', b'#', b'.',
-            b'#', b'#', b'.'
-        ]);
+        assert_eq!(
+            rotated.field,
+            vec![b'#', b'.', b'.', b'.', b'#', b'.', b'#', b'#', b'.']
+        );
         assert_eq!(tile.hash()[3], rotated.hash()[0]);
     }
 
     #[test]
     fn rotate_4() {
-        let tile = Tile::new(vec![
-            b'.', b'.', b'.',
-            b'.', b'#', b'#',
-            b'#', b'.', b'#'
-        ]);
+        let tile = Tile::new(vec![b'.', b'.', b'.', b'.', b'#', b'#', b'#', b'.', b'#']);
         let rotated = tile.rotate(4);
-        assert_eq!(rotated.field, vec![
-            b'#', b'.', b'#',
-            b'.', b'#', b'#',
-            b'.', b'.', b'.'
-        ]);
+        assert_eq!(
+            rotated.field,
+            vec![b'#', b'.', b'#', b'.', b'#', b'#', b'.', b'.', b'.']
+        );
         assert_eq!(tile.hash()[4], rotated.hash()[0]);
     }
 
     #[test]
     fn rotate_5() {
-        let tile = Tile::new(vec![
-            b'.', b'.', b'.',
-            b'.', b'#', b'#',
-            b'#', b'.', b'#'
-        ]);
+        let tile = Tile::new(vec![b'.', b'.', b'.', b'.', b'#', b'#', b'#', b'.', b'#']);
         let rotated = tile.rotate(5);
-        assert_eq!(rotated.field, vec![
-            b'.', b'.', b'.',
-            b'#', b'#', b'.',
-            b'#', b'.', b'#'
-        ]);
+        assert_eq!(
+            rotated.field,
+            vec![b'.', b'.', b'.', b'#', b'#', b'.', b'#', b'.', b'#']
+        );
         assert_eq!(tile.hash()[5], rotated.hash()[0]);
     }
 
     #[test]
     fn rotate_6() {
-        let tile = Tile::new(vec![
-            b'.', b'.', b'.',
-            b'.', b'#', b'#',
-            b'#', b'.', b'#'
-        ]);
+        let tile = Tile::new(vec![b'.', b'.', b'.', b'.', b'#', b'#', b'#', b'.', b'#']);
         let rotated = tile.rotate(6);
-        assert_eq!(rotated.field, vec![
-            b'#', b'.', b'#',
-            b'#', b'#', b'.',
-            b'.', b'.', b'.'
-        ]);
+        assert_eq!(
+            rotated.field,
+            vec![b'#', b'.', b'#', b'#', b'#', b'.', b'.', b'.', b'.']
+        );
         assert_eq!(tile.hash()[6], rotated.hash()[0]);
     }
 
     #[test]
     fn rotate_7() {
-        let tile = Tile::new(vec![
-            b'.', b'.', b'.',
-            b'.', b'#', b'#',
-            b'#', b'.', b'#'
-        ]);
+        let tile = Tile::new(vec![b'.', b'.', b'.', b'.', b'#', b'#', b'#', b'.', b'#']);
         let rotated = tile.rotate(7);
 
-        assert_eq!(rotated.field, vec![
-            b'#', b'#', b'.',
-            b'.', b'#', b'.',
-            b'#', b'.', b'.'
-        ]);
+        assert_eq!(
+            rotated.field,
+            vec![b'#', b'#', b'.', b'.', b'#', b'.', b'#', b'.', b'.']
+        );
         assert_eq!(tile.hash()[7], rotated.hash()[0]);
     }
 }

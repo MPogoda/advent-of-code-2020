@@ -10,10 +10,10 @@ fn parse_input(input: &str) -> Input {
         .split(|ch| ch == ',')
         .map(|num| match num.parse() {
             Ok(v) => Some(v),
-            _ => None
+            _ => None,
         })
         .collect();
-    ( moment, nums )
+    (moment, nums)
 }
 
 #[aoc(day13, part1)]
@@ -42,7 +42,10 @@ fn part2((_, timetable): &Input) -> u64 {
         .fold((0, 1), |(t, step), (i, bus)| {
             let want = (100 * bus - i as u64) % bus;
             let mut next_t = t;
-            while next_t % bus != want { next_t += step; }
+            while next_t % bus != want {
+                next_t += step;
+            }
             (next_t, step * bus)
-        }).0
+        })
+        .0
 }

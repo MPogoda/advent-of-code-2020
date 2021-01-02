@@ -8,8 +8,14 @@ pub fn input_generator(input: &[u8]) -> Vec<Input> {
         .map(|line| {
             let mut parts = line.split(|&ch| ch == b' ');
             let mut range = parts.next().unwrap().split(|&ch| ch == b'-');
-            let lhs = str::from_utf8(range.next().unwrap()).unwrap().parse().unwrap();
-            let rhs = str::from_utf8(range.next().unwrap()).unwrap().parse().unwrap();
+            let lhs = str::from_utf8(range.next().unwrap())
+                .unwrap()
+                .parse()
+                .unwrap();
+            let rhs = str::from_utf8(range.next().unwrap())
+                .unwrap()
+                .parse()
+                .unwrap();
             let ch = *parts.next().unwrap().get(0).unwrap();
             let pwd = parts.next().unwrap().to_vec();
 
@@ -23,10 +29,7 @@ pub fn part1(input: &[Input]) -> usize {
     input
         .iter()
         .filter(|(min, max, ch, pwd)| {
-            let count = pwd
-                .iter()
-                .filter(|&c| c == ch)
-                .count();
+            let count = pwd.iter().filter(|&c| c == ch).count();
             count >= *min && count <= *max
         })
         .count()

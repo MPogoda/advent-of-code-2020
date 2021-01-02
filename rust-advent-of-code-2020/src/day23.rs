@@ -1,9 +1,6 @@
 #[aoc_generator(day23)]
 fn parse_input(input: &[u8]) -> Vec<usize> {
-    input
-        .iter()
-        .map(|ch| (ch - b'0') as usize)
-        .collect()
+    input.iter().map(|ch| (ch - b'0') as usize).collect()
 }
 
 fn perform_move(arr: &mut [usize], n: usize, current: &mut usize) {
@@ -33,7 +30,9 @@ fn part1(input: &[usize]) -> usize {
     arr[input[input.len() - 1]] = input[0];
     let mut current = input[0];
 
-    for _ in 0..100 { perform_move(&mut arr, n, &mut current); }
+    for _ in 0..100 {
+        perform_move(&mut arr, n, &mut current);
+    }
 
     let mut result = 0;
     current = 1;
@@ -61,7 +60,9 @@ fn part2(input: &[usize]) -> usize {
     arr[input[input.len() - 1]] = input.len() + 1;
     let mut current = input[0];
 
-    for _ in 0..10_000_000 { perform_move(&mut arr, n, &mut current); }
+    for _ in 0..10_000_000 {
+        perform_move(&mut arr, n, &mut current);
+    }
 
     arr[1] * arr[arr[1]]
 }

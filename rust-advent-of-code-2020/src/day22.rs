@@ -1,5 +1,5 @@
-use std::collections::{HashSet, VecDeque};
 use std::collections::hash_map::DefaultHasher;
+use std::collections::{HashSet, VecDeque};
 use std::hash::Hasher;
 
 type Deck = VecDeque<u8>;
@@ -11,7 +11,9 @@ fn parse_input(input: &str) -> (Deck, Deck) {
 
     let mut switch = false;
     for line in input.lines() {
-        if line.starts_with("P") { continue }
+        if line.starts_with("P") {
+            continue;
+        }
         if line.is_empty() {
             switch = true;
             continue;
@@ -40,7 +42,6 @@ fn play_game(p1_input: &Deck, p2_input: &Deck) -> Deck {
             p2.push_front(v2);
             p2.push_front(v1);
         }
-
     }
     if p1.is_empty() {
         p2
@@ -76,7 +77,9 @@ fn take_cards(deck: &Deck, n: usize) -> Deck {
 
 fn play_recursive_round(p1: &mut Deck, p2: &mut Deck, memo: &mut HashSet<u64>) -> bool {
     let hash = calculate_hash(p1, p2);
-    if memo.contains(&hash) { return true }
+    if memo.contains(&hash) {
+        return true;
+    }
     memo.insert(hash);
 
     let c1 = p1.pop_back().unwrap() as usize;
@@ -105,7 +108,9 @@ fn play_recursive_round(p1: &mut Deck, p2: &mut Deck, memo: &mut HashSet<u64>) -
 fn play_recursive_game<'a>(p1: &'a mut Deck, p2: &'a mut Deck) -> (bool, &'a mut Deck) {
     let mut memo = HashSet::new();
     while !p1.is_empty() && !p2.is_empty() {
-        if play_recursive_round(p1, p2, &mut memo) { return (true, p1) }
+        if play_recursive_round(p1, p2, &mut memo) {
+            return (true, p1);
+        }
     }
 
     if p1.is_empty() {

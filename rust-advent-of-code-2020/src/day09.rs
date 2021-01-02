@@ -15,8 +15,12 @@ fn part1(input: &[i64]) -> i64 {
     let mut window: VecDeque<_> = (&mut iter).take(25).collect();
 
     for n in iter {
-        if (&window).iter().find(|&x| (&window).contains(&&(n - *x))).is_none() {
-            return *n
+        if (&window)
+            .iter()
+            .find(|&x| (&window).contains(&&(n - *x)))
+            .is_none()
+        {
+            return *n;
         }
         window.pop_front();
         window.push_back(&n);
@@ -39,7 +43,9 @@ fn part2(input: &[i64]) -> i64 {
         while !list.is_empty() && sum > bad_num {
             sum -= list.pop_front().unwrap();
         }
-        if sum == bad_num && list.len() > 1 { break }
+        if sum == bad_num && list.len() > 1 {
+            break;
+        }
     }
 
     let (&min, &max) = list.iter().minmax().into_option().unwrap();
