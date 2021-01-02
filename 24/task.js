@@ -2,8 +2,6 @@
 const rawData = require('fs').readFileSync('input', 'UTF-8').split('\n');
 rawData.pop();
 
-console.debug(rawData);
-
 function parseLine(line) {
     let north = 0;
     let east = 0;
@@ -93,9 +91,8 @@ console.time("Part 2");
 
     for (let i = 0; i < 100; ++i) {
         [flipped, [[minn, maxn], [mine, maxe]]] = evolve(flipped, [[minn, maxn], [mine, maxe]]);
-        console.info("Iteration", i,
-            Array.from(flipped.entries()).reduce((acc, [, v]) => acc + (v ? 1 : 0), 0)
-        );
     }
+    console.info(Array.from(flipped.entries()).reduce((acc, [, v]) => acc + (v ? 1 : 0), 0)
+    );
 })();
 console.timeEnd("Part 2");
